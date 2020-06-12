@@ -1,0 +1,70 @@
+# Création d'une datafarme de GES
+dfEmissionsGES=dfMondesum.merge(dfOCDEsum,left_on='Year',right_on='Year')
+dfEmissionsGES=dfEmissionsGES.merge(dfUEsum,left_on='Year',right_on='Year')
+dfEmissionsGES=dfEmissionsGES.merge(dfBricssum,left_on='Year',right_on='Year')
+
+dfEmissionsGESv2=dfEmissionsGES.reset_index()
+
+
+# Création d'une datafarme de températures
+for i in dataframetemp.columns:
+  print(i)
+dftempv1=dataframetemp.drop(columns=[' ISO3', 'ISO3v2'])
+dftempv1["Period"]=dftempv1[" Year"].map(str)+dftempv1[" Statistics"]
+dftempv2=dftempv1.groupby("Period").mean()
+dftempv3=dftempv2.groupby(" Year").mean()
+dftempv4=dftempv3.reset_index()
+dftempv4[' Year']
+
+
+# Création d'une datafarme CO2
+dataCO2= pd.read_csv("/content/gdrive/My Drive/API_EN.ATM.CO2E.KT_DS2_en_csv_v2_989664.csv",sep=',',header=1, skiprows=[0,3])
+dataCO2=dataCO2.drop(columns=['Country Code','Indicator Name','Indicator Code','Unnamed: 64'])
+dataCO2=dataCO2.set_index('Country Name')
+dataCO2=dataCO2.transpose()
+dataCO2=dataCO2.reset_index()
+
+namemapping={'index':'Year'}
+dataCO2=dataCO2.rename(columns=namemapping)
+dataCO2world=dataCO2[["Year","World"]]
+dataCO2worldv2=dataCO2world.copy()
+dataCO2worldv2["Year"]=dataCO2worldv2["Year"].astype(int)
+dataCO2worldv2["Year"]
+
+
+#Creation de la base de données CO2 et température réunies
+#dfCO2etTemp=dataCO2world.merge(dftempv3, left_on='Year',right_on='Year')
+dfCO2etTemp=dftempv4.merge(dataCO2worldv2, left_on=' Year',right_on='Year')
+dfCO2etTemp=dfCO2etTemp.drop(columns=["Year"])
+
+
+# Graphe sur l'évolution des températures
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+sns.set()
+#dataCO2.Year=pd.to_dateyear(dataCO2.Year)
+plt.figure(figsize=(15,5))
+chart=sns.lineplot(x=dataCO2world.Year, y=dataCO2world.World, color='blueviolet')
+plt.xlim("1960","2019")
+plt.xlabel('Années')
+plt.ylabel('Emissions de CO2 (kt)')
+plt.title("Emissions de CO2")
+plt.xticks(dataCO2world.Year,rotation =45)
+
+#, np.arange(1960,2018, step=10)
+#chart.set_xticklabels(chart.get_xticklabels(), rotation=45)
+plt.show()
+dfCO2etTemp=dfCO2etTemp.drop([24,25],axis=0)
+
+
+# Graphe sur l'évolution des températures et des émission de cO2
+plt.figure(figsize=(15,8))
+ax1=sns.lineplot(x=dfCO2etTemp[' Year'], y=dfCO2etTemp['Temperature - (Celsius)'], color="maroon")
+ax2 = plt.twinx()
+sns.lineplot(x=dfCO2etTemp[' Year'], y=dfCO2etTemp.World,data=dfCO2etTemp, color="blueviolet",ax=ax2)
+#plt.xlabel('Années')
+#CO2 emissions (kt)
+plt.title("Emissions de CO2 et moyenne des températures (monde)")
+ax1.set_ylabel('Temperature - (Celsius)', color="maroon")
+ax2.set_ylabel('CO2 emissions (kt)', color="blueviolet")
