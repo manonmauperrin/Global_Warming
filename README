@@ -1,0 +1,14 @@
+# Global_Warming
+Projet sur le réchauffement climatique
+
+Le but de ce projet est de démontrer au climato-sceptiques par l'analyse de données, l'existence et le caractère urgent du réchauffement
+climatique. Nous avons donc décider de faire de la Dataviz sur la base de données de l'OECD. Après avoir fait un nettoyage de données
+nous pouvons choisir les colonnes qui nous interesse et sortir des graphiques. 
+Plus précisément nous avons choisi de faire ressortir l'impact de l'avtivité humaine comparé aux autres activités rejettant des GES.
+
+Etapes 
+
+1. Nettoyage de données
+2. Evolution des temperatures
+3. Comparaison de l'évolution des températures et émissions de CO2
+4. Emissions de GES par types d'activités (mise en évidence de l'activité humaine
