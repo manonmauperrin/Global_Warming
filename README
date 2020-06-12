@@ -6,7 +6,7 @@ climatique. Nous avons donc décider de faire de la Dataviz sur la base de donn�
 nous pouvons choisir les colonnes qui nous interesse et sortir des graphiques. 
 Plus précisément nous avons choisi de faire ressortir l'impact de l'avtivité humaine comparé aux autres activités rejettant des GES.
 
-Etapes 
+# Etapes 
 
 1. Nettoyage de données
 2. Evolution des temperatures
