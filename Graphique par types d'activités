@@ -1,0 +1,130 @@
+plt.figure(figsize=(10,5))
+
+plt.plot(dfEmissionsbyindusv2.Year, dfEmissionsbyindusv2.Energy,label='Energy')
+plt.plot(dfEmissionsbyindusv2.Year, dfEmissionsbyindusv2['Industrial processes and product use'],label='Industrial processes and product use' )
+plt.plot(dfEmissionsbyindusv2.Year, dfEmissionsbyindusv2.Agriculture,label='Agriculture')
+plt.plot(dfEmissionsbyindusv2.Year, dfEmissionsbyindusv2.Waste,label='Waste')
+plt.plot(dfEmissionsbyindusv2.Year, dfEmissionsbyindusv2.Agriculture,label='Other')
+#plt.plot(dfEmissionsbyindusv2.Year, dfEmissionsbyindusv2['Total emissions excluding LULUCF'],label='Total emissions excluding LULUCF')
+
+plt.legend()
+plt.xlabel('Années')
+plt.ylabel('GES en équivalent de tonnes de CO2 en milliers')
+plt.title("Emissions de gaz à effet de serre")
+plt.show()
+
+# GRAPHE MISE EN EVIDENCE DE L'ACTIVITE INDUSTRIELLE PAR RAPPORT AUX EMIISIONS DE CO2 DANS LE MONDE (1990 à 2015)
+
+dfEmissionsbyindusv2
+df_pie = dfEmissionsbyindusv2.sum()
+df_pie2 = df_pie.drop(['Year', 'Total emissions excluding LULUCF', 'Energy Industries', 'Manufacturing industries and construction', 'Transport', 'Residential and other sectors', 'Energy - Other', 'Fugitive Emissions from Fuels', 'CO2 from Transport and Storage'])
+
+df_pie2.value_counts
+
+fig, ax = plt.subplots(figsize=(8, 8), subplot_kw=dict(aspect="equal"))
+patches, texts, autotexts =ax.pie(df_pie2, autopct='%0.1f%%',
+        shadow=True, startangle=180,  radius=5, textprops=dict(color="w"), explode = (0,0,0.3,0, 0))
+plt.legend(title="Sectors",
+          labels = df_pie2.index,
+          loc="center left",
+          bbox_to_anchor=(1, 0, 0.5, 1))
+plt.setp(autotexts, size=12, weight="bold")
+plt.axis('equal')
+plt.title("Emissions of GES by sectors in the world (1990 to 2015)")
+
+#nouvelle database avec pourcentage pour calcul des ratios
+dfEmissionsbyindusv2
+df_pb = dfEmissionsbyindusv2.sum()
+df_pb2 = df_pie.drop(['Year', 'Total emissions excluding LULUCF', 'Agriculture', 'Waste', 'Other', 'Industrial processes and product use'])
+df_pb2
+df_pb2.value_counts
+
+#calcul des ratios
+ratio1 = df_pb2.loc['Energy Industries']/df_pb2.loc['Energy']
+ratio2 = df_pb2.loc['Transport']/df_pb2.loc['Energy']
+ratio3 = df_pb2.loc['Manufacturing industries and construction']/df_pb2.loc['Energy']
+ratio4 = df_pb2.loc['Residential and other sectors']/df_pb2.loc['Energy']
+ratio5 = df_pb2.loc['Energy - Other']/df_pb2.loc['Energy']
+ratio6 = df_pb2.loc['Fugitive Emissions from Fuels']/df_pb2.loc['Energy']
+ratio7 = df_pb2.loc['CO2 from Transport and Storage']/df_pb2.loc['Energy']
+print(ratio1)
+print(ratio2)
+print(ratio3)
+print(ratio4)
+print(ratio5)
+print(ratio6)
+print(ratio7)
+
+
+
+
+# FIGURE FINALE AVEC GRAPHE EMISSION GES PAR SECTEURS + ZOOM SECTEUR ENERGIE  
+
+import numpy as np
+from matplotlib.patches import ConnectionPatch
+
+#création de la database, et des pourcentages
+dfEmissionsbyindusv2
+df_pie = dfEmissionsbyindusv2.sum()
+df_pie2 = df_pie.drop(['Year', 'Total emissions excluding LULUCF', 'Energy Industries', 'Manufacturing industries and construction', 'Transport', 'Residential and other sectors', 'Energy - Other', 'Fugitive Emissions from Fuels', 'CO2 from Transport and Storage'])
+
+
+#création de la figure
+fig = plt.figure(figsize=(30, 15))
+ax1 = fig.add_subplot(122)
+ax2 = fig.add_subplot(121)
+fig.subplots_adjust(wspace=-0.25)
+
+# graphe 1 : pie chart pourcentages par secteurs
+#labels = ('Energy', 'Agriculture', 'Waste', 'Other', 'Industrial processes and product use')
+#angle = -180 * ratios[0]
+ax1.pie(df_pie2, autopct='%1.1f%%', startangle=45, explode = (0.1,0,0, 0, 0), textprops=dict(color = "w"))
+ax1.legend(('Energy', 'Industrial processes and product use', 'Agriculture', 'Waste', 'Other'))
+
+
+# graphe 2 : bar chart zoom secteur industrie
+xpos = 0
+bottom = 0
+ratios = [ratio1,ratio2,ratio3,ratio4,ratio5,ratio6,ratio7]
+width = 1
+
+colors = [[.1, .3, .9], [.1, .3, .7], [.1, .3, .5], [.1, .3, .3], [.1, .3, .2], [.1, .3, .2], [.1, .1, .1]]
+
+for j in range(len(ratios)):
+    height = ratios[j]
+    ax2.bar(xpos, height, width, bottom=bottom, color=colors[j])
+    ypos = bottom + ax2.patches[j].get_height() / 2
+    bottom += height
+    ax2.text(xpos, ypos, "%d%%" % (ax2.patches[j].get_height() * 100),
+             ha='center')
+
+ax2.legend(('Energy Industries', 'Transport', 'Manufacturing industries and construction', 'Residential and other sectors', 'Energy - Other', 'Fugitive Emissions from Fuels', 'CO2 from Transport and Storage'))
+ax2.axis('off')
+ax2.set_xlim( - 2.5 * width,  2.5 * width)
+
+# 
+theta1, theta2 = ax1.patches[1].theta1, ax1.patches[-1].theta2
+center, r = ax1.patches[0].center, ax1.patches[-1].r
+bar_height = sum([item.get_height() for item in ax2.patches])
+
+
+# 
+x = r * np.cos(np.pi / 180 * theta2) + center[0]
+y = np.sin(np.pi / 180 * theta2) + center[-1]
+con = ConnectionPatch(xyA=(width / 2, bar_height), xyB=(x, y),
+                      coordsA="data", coordsB="data", axesA=ax2, axesB=ax1)
+con.set_color([0, 0, 0])
+con.set_linewidth(2)
+ax2.add_artist(con)
+
+# 
+x = r * np.cos(np.pi / 180 * theta1) + center[0]
+y = np.sin(np.pi / 180 * theta1) + center[-1]
+con = ConnectionPatch(xyA=(width / 2, 0), xyB=(x, y), coordsA="data",
+                      coordsB="data", axesA=ax2, axesB=ax1)
+con.set_color(c ='black')
+ax2.add_artist(con)
+con.set_linewidth(2)
+
+
+plt.show()
