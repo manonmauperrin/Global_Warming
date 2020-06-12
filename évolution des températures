@@ -1,0 +1,17 @@
+#on réduit la datafrale avec les colonnes dont on a besoin
+df=dataframe.loc[:,['Country','Pollutant','Variable','Year','Unit','PowerCode','Value']]
+
+#on réduit les lignes dont on a besoin (on ne veut que des données en valeur, on enlève donc tout ce qui n'est pas Tonnes of CO2 equivalent)
+df1=df.loc[df["Unit"]=="Tonnes of CO2 equivalent"]
+#on ne regarde que les greehouse gases et on veut des unités en tonnes of CO2 equivalent,+ on veut total emission excluding LULUCF
+df1=df1.loc[df1["Pollutant"]=="Greenhouse gases"]
+df1=df1.loc[df1["PowerCode"]=="Thousands"]
+df1=df1.loc[df1["Variable"]=="Total  emissions excluding LULUCF"]
+
+#mettre les pays en index
+df2=df1.set_index('Country') 
+
+#on ne regarde que le monde
+dfMonde=df2.drop('OECD - Total')
+dfMonde=dfMonde.drop('OECD - Europe')
+dfMonde=dfMonde.drop('European Union (28 countries)')
