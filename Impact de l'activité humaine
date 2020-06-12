@@ -1,0 +1,158 @@
+#on réduit la datafrale avec les colonnes dont on a besoin
+df=dataframe.loc[:,['Country','Pollutant','Variable','Year','Unit','PowerCode','Value']]
+
+#on réduit les lignes dont on a besoin (on ne veut que des données en valeur, on enlève donc tout ce qui n'est pas Tonnes of CO2 equivalent)
+df1=df.loc[df["Unit"]=="Tonnes of CO2 equivalent"]
+
+#on affiche les différents pays. OECD TOTAL, OECD Europe et EU vont devoir être enlevés pour éviter des redondances qui on fera les sommes
+arr=[]
+for i in df1["Country"]:
+  if i not in arr:
+    arr.append(i)
+print(arr)
+
+#mettre les pays en index
+df2=df1.set_index('Country')
+
+#enlever les lignes pour éviter d'avoir des redondances quand on fera la somme:'OECD - Total', 'OECD - Europe'European Union (28 countries)'
+df2=df2.drop('OECD - Total')
+df2=df2.drop('OECD - Europe')
+df2=df2.drop('European Union (28 countries)')
+
+# Colonnes 
+arr4=[]
+for i in df2['Pollutant']:
+  if i not in arr4:
+    arr4.append(i)
+print(arr4)
+print("")
+
+arr5=[]
+for i in df2['PowerCode']:
+  if i not in arr5:
+    arr5.append(i)
+print(arr5)
+print("")
+
+#on ne regarde que les greehouse gases et on veut des unités en tonnes of CO2 equivalent
+df3=df2.loc[df2["Pollutant"]=="Greenhouse gases"]
+df3=df3.loc[df3["PowerCode"]=="Thousands"]
+
+#on a donc des values en tonnes of CO2 equivalent in Thousands. ON peut donc enlever ces colonnes
+df4=df3.loc[:,['Variable','Year','Value']]
+#ça nous donne une database avec en index les pays, en colonnes les variables, les années et la valeur d'émissions de gaz à effet de serre 
+#en tonnes of CO2 equivalent in Thousands
+
+#on vérifie le taux de remplissage de df4
+def fct3(df):
+  taux=df.count()/len(df)*100 
+  return taux
+fct3(df4)
+
+dfEnergy=df4.loc[df4["Variable"]=="1 - Energy"]
+dfEnergy=dfEnergy.groupby("Year").sum()
+namemap={'Value':'Energy'}
+dfEnergy=dfEnergy.rename(columns=namemap)
+dfEnergy
+#ici on a seulement les emissions pour l'énergie, dans le monde de 1990 à 2017
+
+dfIndus=df4.loc[df4["Variable"]=="2- Industrial processes and product use"]
+dfIndus=dfIndus.groupby("Year").sum()
+namemap={'Value':'Industrial processes and product use'}
+dfIndus=dfIndus.rename(columns=namemap)
+dfIndus
+#ici on a seulement les emissions pour les "2- Industrial processes and product use", dans le monde de 1990 à 2017
+
+dfAgri=df4.loc[df4["Variable"]=="3 - Agriculture"]
+dfAgri=dfAgri.groupby("Year").sum()
+namemap={'Value':'Agriculture'}
+dfAgri=dfAgri.rename(columns=namemap)
+dfAgri
+#ici on a seulement les emissions pour les "3 - Agriculture", dans le monde de 1990 à 2017
+
+dfWaste=df4.loc[df4["Variable"]=="5 - Waste"]
+dfWaste=dfWaste.groupby("Year").sum()
+namemap={'Value':'Waste'}
+dfWaste=dfWaste.rename(columns=namemap)
+dfWaste
+#ici on a seulement les emissions pour les "5 - Waste", dans le monde de 1990 à 2017
+
+dfTotal=df4.loc[df4["Variable"]=="Total  emissions excluding LULUCF"]
+dfTotal=dfTotal.groupby("Year").sum()
+namemap={'Value':'Total emissions excluding LULUCF'}
+dfTotal=dfTotal.rename(columns=namemap)
+dfTotal
+#ici on a seulement les emissions pour les "Total  emissions excluding LULUCF", dans le monde de 1990 à 2017
+
+dfOther=df4.loc[df4["Variable"]=="6 - Other"]
+dfOther=dfOther.groupby("Year").sum()
+namemap={'Value':'Other'}
+dfOther=dfOther.rename(columns=namemap)
+dfOther
+#ici on a seulement les emissions pour other, dans le monde de 1990 à 2017
+
+df1A1EnergyIndustries=df4.loc[df4["Variable"]=="1A1 - Energy Industries"]
+df1A1EnergyIndustries=df1A1EnergyIndustries.groupby("Year").sum()
+namemap={'Value':'Energy Industries'}
+df1A1EnergyIndustries=df1A1EnergyIndustries.rename(columns=namemap)
+df1A1EnergyIndustries
+#ici on a seulement les emissions pour Energy-1A1 - Energy Industries, dans le monde de 1990 à 2017
+
+df1A2Manufacturingindustriesandconstruction=df4.loc[df4["Variable"]=="1A2 - Manufacturing industries and construction"]
+df1A2Manufacturingindustriesandconstruction=df1A2Manufacturingindustriesandconstruction.groupby("Year").sum()
+namemap={'Value':'Manufacturing industries and construction'}
+df1A2Manufacturingindustriesandconstruction=df1A2Manufacturingindustriesandconstruction.rename(columns=namemap)
+df1A2Manufacturingindustriesandconstruction
+#ici on a seulement les emissions pour Energy-1A2 - Manufacturing industries and construction, dans le monde de 1990 à 2017
+
+df1A3Transport=df4.loc[df4["Variable"]=="1A3 - Transport"]
+df1A3Transport=df1A3Transport.groupby("Year").sum()
+namemap={'Value':'Transport'}
+df1A3Transport=df1A3Transport.rename(columns=namemap)
+df1A3Transport
+#ici on a seulement les emissions pour Energy-1A3Transport, dans le monde de 1990 à 2017
+
+df1A4Residentialandothersectors=df4.loc[df4["Variable"]=="1A4 - Residential and other sectors"]
+df1A4Residentialandothersectors=df1A4Residentialandothersectors.groupby("Year").sum()
+namemap={'Value':'Residential and other sectors'}
+df1A4Residentialandothersectors=df1A4Residentialandothersectors.rename(columns=namemap)
+df1A4Residentialandothersectors
+#ici on a seulement les emissions pour Energy-1A4 - Residential and other sectors, dans le monde de 1990 à 2017
+
+df1A5EnergyOther=df4.loc[df4["Variable"]=="1A5 - Energy - Other"]
+df1A5EnergyOther=df1A5EnergyOther.groupby("Year").sum()
+namemap={'Value':'Energy - Other'}
+df1A5EnergyOther=df1A5EnergyOther.rename(columns=namemap)
+df1A5EnergyOther
+#ici on a seulement les emissions pour Energy-1A5 - Energy - Other, dans le monde de 1990 à 2017
+
+df1BFugitiveEmissionsfromFuels=df4.loc[df4["Variable"]=="1B - Fugitive Emissions from Fuels"]
+df1BFugitiveEmissionsfromFuels=df1BFugitiveEmissionsfromFuels.groupby("Year").sum()
+namemap={'Value':'Fugitive Emissions from Fuels'}
+df1BFugitiveEmissionsfromFuels=df1BFugitiveEmissionsfromFuels.rename(columns=namemap)
+df1BFugitiveEmissionsfromFuels
+#ici on a seulement les emissions pour Energy-1B - Fugitive Emissions from Fuels, dans le monde de 1990 à 2017
+
+df1CCO2fromTransportandStorage=df4.loc[df4["Variable"]=="1C - CO2 from Transport and Storage"]
+df1CCO2fromTransportandStorage=df1CCO2fromTransportandStorage.groupby("Year").sum()
+namemap={'Value':'CO2 from Transport and Storage'}
+df1CCO2fromTransportandStorage=df1CCO2fromTransportandStorage.rename(columns=namemap)
+df1CCO2fromTransportandStorage
+#ici on a seulement les emissions pour Energy-1C - CO2 from Transport and Storage, dans le monde de 1990 à 2017
+
+dfEmissionsbyindus=dfEnergy.merge(dfIndus, left_on='Year',right_on='Year')
+dfEmissionsbyindus=dfEmissionsbyindus.merge(dfAgri,left_on='Year',right_on='Year')
+dfEmissionsbyindus=dfEmissionsbyindus.merge(dfWaste,left_on='Year',right_on='Year')
+dfEmissionsbyindus=dfEmissionsbyindus.merge(dfOther,left_on='Year',right_on='Year')
+dfEmissionsbyindus=dfEmissionsbyindus.merge(dfTotal,left_on='Year',right_on='Year')
+
+dfEmissionsbyindus=dfEmissionsbyindus.merge(df1A1EnergyIndustries,left_on='Year',right_on='Year')
+dfEmissionsbyindus=dfEmissionsbyindus.merge(df1A2Manufacturingindustriesandconstruction,left_on='Year',right_on='Year')
+dfEmissionsbyindus=dfEmissionsbyindus.merge(df1A3Transport,left_on='Year',right_on='Year')
+dfEmissionsbyindus=dfEmissionsbyindus.merge(df1A4Residentialandothersectors,left_on='Year',right_on='Year')
+dfEmissionsbyindus=dfEmissionsbyindus.merge(df1A5EnergyOther,left_on='Year',right_on='Year')
+dfEmissionsbyindus=dfEmissionsbyindus.merge(df1BFugitiveEmissionsfromFuels,left_on='Year',right_on='Year')
+dfEmissionsbyindus=dfEmissionsbyindus.merge(df1CCO2fromTransportandStorage,left_on='Year',right_on='Year')
+
+dfEmissionsbyindusv2=dfEmissionsbyindus.reset_index()
+
